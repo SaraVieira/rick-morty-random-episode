@@ -1,28 +1,83 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component, Fragment } from 'react'
+import Episode from './Episode'
+import Characters from './Characters'
+
+const totesRandom = n => Math.floor(Math.random() * n) + 1
 
 class App extends Component {
+  state = {
+    episode: {},
+    numberOfEpsisodes: 0,
+    chars: [],
+    empty: true
+  }
+
+  loadEpisodeNumbers = async () => {
+    const data = await fetch('https://rickandmortyapi.com/api/episode/')
+    const json = await data.json()
+
+    this.setState({
+      episodeNumber: totesRandom(json.info.count),
+      chars: [],
+      character: {}
+    })
+  }
+
+  getChar = async url => {
+    const data = await fetch(url)
+    const { name, status, species, image } = await data.json()
+
+    this.setState({
+      chars: this.state.chars.concat({ name, status, species, image })
+    })
+  }
+
+  loadEpisode = async () => {
+    await this.loadEpisodeNumbers()
+    const { episodeNumber } = this.state
+    const data = await fetch(
+      `https://rickandmortyapi.com/api/episode/${episodeNumber}`
+    )
+    const episode = await data.json()
+
+    episode.characters.map(c => this.getChar(c))
+
+    this.setState({
+      empty: false,
+      episode: {
+        name: episode.name,
+        date: episode.air_date,
+        episode: episode.episode
+      }
+    })
+  }
+
   render() {
+    const { episode, chars, empty } = this.state
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        {episode.name && chars.length > 0 ? (
+          <Fragment>
+            <Episode {...episode} />
+            <Characters chars={chars} />
+          </Fragment>
+        ) : null}
+        {empty ? (
+          <h3 class="f2 tc mb3 f1-m f-headline-l measure-narrow lh-title mv0">
+            <span class="bg-black-90 lh-copy white pa1 tracked-tight">
+              Get a random Rick and Morty Episode
+            </span>
+          </h3>
+        ) : null}
+        <button
+          className="pointer btn f6 link dim br1 ph3 pv2 mb2 dib black bg-white"
+          onClick={() => this.loadEpisode()}
+        >
+          Get Episode
+        </button>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App
