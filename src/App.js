@@ -64,7 +64,7 @@ class App extends Component {
         ) : null}
         {empty ? (
           <h3 class="f2 tc mb3 f1-m f-headline-l measure-narrow lh-title mv0">
-            <span class="bg-black-90 lh-copy white pa1 tracked-tight">
+            <span class="bg-black-90 lh-copy white pa1">
               Get a random Rick and Morty Episode
             </span>
           </h3>
