@@ -1,45 +1,48 @@
 import React, { Component, Fragment } from 'react'
 import Episode from './Episode'
 import Characters from './Characters'
-
-const totesRandom = n => Math.floor(Math.random() * n) + 1
+import {
+  totesRandom,
+  episodesURL,
+  charURL,
+  fetchData,
+  episodeURL,
+  getIds
+} from './utils'
 
 class App extends Component {
   state = {
     episode: {},
-    numberOfEpsisodes: 0,
+    episodeNumber: null,
     chars: [],
     empty: true
   }
 
   loadEpisodeNumbers = async () => {
-    const data = await fetch('https://rickandmortyapi.com/api/episode/')
-    const json = await data.json()
+    const {
+      info: { count }
+    } = await fetchData(episodesURL)
 
     this.setState({
-      episodeNumber: totesRandom(json.info.count),
-      chars: [],
-      character: {}
+      episodeNumber: totesRandom(count),
+      chars: []
     })
   }
 
   getChar = async ids => {
-    const data = await fetch(`https://rickandmortyapi.com/api/character/${ids}`)
-    const chars = await data.json()
+    const chars = await fetchData(charURL(ids))
 
     this.setState({ chars })
   }
 
   loadEpisode = async () => {
+    // Load number of episodes
     await this.loadEpisodeNumbers()
     const { episodeNumber } = this.state
-    const data = await fetch(
-      `https://rickandmortyapi.com/api/episode/${episodeNumber}`
-    )
-    const episode = await data.json()
+    const episode = await fetchData(episodeURL(episodeNumber))
 
-    const ids = episode.characters.map(c => parseInt(c.match(/\d+$/)))
-    this.getChar(ids)
+    // get all charecters in episode
+    this.getChar(getIds(episode))
 
     this.setState({
       empty: false,
@@ -62,8 +65,8 @@ class App extends Component {
           </Fragment>
         ) : null}
         {empty ? (
-          <h3 class="f2 tc mb3 f1-m f-headline-l measure-narrow lh-title mv0">
-            <span class="bg-black-90 lh-copy white pa1">
+          <h3 className="f2 tc mb3 f1-m f-headline-l measure-narrow lh-title mv0">
+            <span className="bg-black-90 lh-copy white pa1">
               Get a random Rick and Morty Episode
             </span>
           </h3>
