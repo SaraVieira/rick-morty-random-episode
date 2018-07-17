@@ -23,13 +23,11 @@ class App extends Component {
     })
   }
 
-  getChar = async url => {
-    const data = await fetch(url)
-    const { name, status, species, image } = await data.json()
+  getChar = async ids => {
+    const data = await fetch(`https://rickandmortyapi.com/api/character/${ids}`)
+    const chars = await data.json()
 
-    this.setState({
-      chars: this.state.chars.concat({ name, status, species, image })
-    })
+    this.setState({ chars })
   }
 
   loadEpisode = async () => {
@@ -40,7 +38,8 @@ class App extends Component {
     )
     const episode = await data.json()
 
-    episode.characters.map(c => this.getChar(c))
+    const ids = episode.characters.map(c => parseInt(c.match(/\d+$/)))
+    this.getChar(ids)
 
     this.setState({
       empty: false,
