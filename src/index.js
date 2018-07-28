@@ -1,10 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './index.css'
 import Home from './Pages/Home'
 import Episode from './Pages/Episode'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import 'tachyons'
+
+import './index.css'
+import 'tachyons/css/tachyons.min.css'
 
 const App = () => (
   <Router>
